@@ -1,4 +1,4 @@
-const nftCollection = [];
+const vault = [];
 
 function mintNFT(name, model, year, category) {
   const nft = {
@@ -7,14 +7,14 @@ function mintNFT(name, model, year, category) {
     year: year,
     category: category,
   };
-  nftCollection.push(nft);
+  vault.push(nft);
 }
 
 function listNFTs() {
   console.log("The Generated NFTs are : ");
-  for (const nft of nftCollection) {
+  for (const nft of vault) {
     console.log(
-      `[${nftCollection.indexOf(nft) + 1}].`,
+      `[${vault.indexOf(nft) + 1}].`,
       nft.name,
       nft.model,
       nft.year,
@@ -24,7 +24,7 @@ function listNFTs() {
 }
 
 function getTotalSupply() {
-  return nftCollection.length;
+  return vault.length;
 }
 
 
