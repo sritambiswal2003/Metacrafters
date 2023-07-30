@@ -12,7 +12,7 @@ export default function HomePage() {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [buyItem, setBuyItem] = useState("");
 
-  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const contractAddress = "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4";
   const atmABI = atm_abi.abi;
 
   const getWallet = async () => {
