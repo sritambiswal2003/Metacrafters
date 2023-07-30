@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import atm_abi from "../artifacts/contracts/SCM.sol/SCM.json";
+import atm_abi from "ETH + AVAX PROOF: Intermediate EVM Course/Smart Contract Management/SCM-Starter-main/contracts/Assessment.sol";
 import backgroundImage from "../assets/background-image.jpg";
 
 export default function HomePage() {
