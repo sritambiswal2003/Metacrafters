@@ -1,6 +1,6 @@
 # Project Title
 
-Simple overview of use/purpose.
+This Solidity program serves as my culminating project for the ETH PROOF: Beginner EVM Course module. The contract's primary objective is to generate a new token and facilitate its distribution to various addresses and users.
 
 ## Description
 
