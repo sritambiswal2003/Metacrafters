@@ -19,6 +19,16 @@ For this project, we have to write a smart contract that implements the require(
  condition is not met, the function will revert with an error message "Input must be greater than 10." The function is declared as pure, meaning it does not modify 
  the contract's state.
 
+## Usage
+
+require():
+The require() function is mainly used for validating input parameters or enforcing preconditions before executing a function. It checks if a condition is true, and if the condition is not met, the function execution is immediately reverted, and any changes made to the contract's state during that execution are undone. It helps prevent invalid or unexpected inputs from causing issues.
+
+assert():
+The assert() function is used to check for conditions that should never be false under any circumstances. It is used to detect bugs in the contract logic, and if an assertion fails, it indicates a critical error in the contract's code. Unlike require(), an assert() statement indicates a bug in the contract and should not be used for input validation or user-driven checks.
+
+revert():
+The revert() function is used when you want to explicitly revert the transaction under certain conditions. It allows you to provide a custom error message that will be returned to the sender of the transaction. It is often used to give more detailed information about the reason for the failure.
 
 
 ## Authors
