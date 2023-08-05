@@ -8,7 +8,7 @@ contract ExceptionHandlingContract {
         number = _number;
     }
 
-    function requireStatement(uint _number) public view returns (uint) {
+    function requireStatement(uint _number) public pure returns (uint) {
         require(_number > 0, "Number must be greater than zero");
         return _number;
     }
@@ -19,7 +19,8 @@ contract ExceptionHandlingContract {
     }
 
     function revertStatement(uint _i) public pure {
-        require(_i > 10, "Input must be greater than 10");
+        if(_i>10){
+        revert( "Input must be greater than 10");}
         
     }
 }
