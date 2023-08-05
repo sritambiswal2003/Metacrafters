@@ -9,7 +9,7 @@ window.addEventListener('load', async () => {
   }
 
   // Contract address and ABI (Replace with your deployed contract details)
-  const contractAddress = 'CONTRACT_ADDRESS';
+  const contractAddress = '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4';
   const contractABI = [
     {
       "inputs": [
