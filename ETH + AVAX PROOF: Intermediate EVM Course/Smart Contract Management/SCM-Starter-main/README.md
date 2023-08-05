@@ -1,4 +1,39 @@
-# Starter Next/Hardhat Project
+## Bank
+This intuitive web3 application provides a decentralized banking experience by leveraging the Ethereum network. Users can seamlessly deploy a smart contract, transfer Ether, and personalize their account names. The application is built using the solidity smart contract language, the robust Ethers.js library, and integrates with the user-friendly MetaMask wallet extension for Ethereum transactions.
+
+## Application Preview
+
+![WhatsApp Image 2023-08-05 at 7 03 00 PM](https://github.com/sritambiswal2003/Metacrafters/assets/139357786/cd892564-20a4-47ef-9238-1e7e4c5b4ad9)
+![WhatsApp Image 2023-08-05 at 7 03 32 PM](https://github.com/sritambiswal2003/Metacrafters/assets/139357786/ad498cac-6ba3-473f-bc65-50213286cdf5)
+![WhatsApp Image 2023-08-05 at 7 03 52 PM](https://github.com/sritambiswal2003/Metacrafters/assets/139357786/9917153b-9048-4757-b242-02491dfcef57)
+![WhatsApp Image 2023-08-05 at 7 05 31 PM](https://github.com/sritambiswal2003/Metacrafters/assets/139357786/d3f8a407-4cb4-4d5a-9079-78db5ed0d087)
+
+
+## Technologies Used
+
+HTML: The application's structure is built using HTML, providing the foundation for the user interface.
+
+CSS: CSS styling is used to create an appealing and responsive design, enhancing the user experience.
+
+Solidity: The smart contract logic is written in Solidity, enabling secure and efficient banking operations on the Ethereum blockchain.
+
+Ethers.js: This powerful JavaScript library is used to interact with the Ethereum blockchain, making it seamless for users to perform transactions.
+
+MetaMask: The user-friendly MetaMask wallet extension ensures secure and easy interaction with the Ethereum network, allowing users to sign transactions with their private keys.
+
+## Usage
+
+Users access the web3 application through a web browser with MetaMask installed and connected to the Ethereum network.
+
+After connecting their MetaMask wallet, users can deploy their personalized smart contract to create their decentralized bank.
+
+Users can transfer Ether to other addresses within the application securely and seamlessly.
+
+Each user can set and update their account name, adding a personalized touch to their decentralized banking experience.
+
+Real-time balances and transaction history provide users with a transparent overview of their banking activities.
+
+## Installation
 
 After cloning the github, you will want to do the following to get the code running on your computer.
 
