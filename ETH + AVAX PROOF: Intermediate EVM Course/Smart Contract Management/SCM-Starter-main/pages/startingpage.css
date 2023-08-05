@@ -1,9 +1,22 @@
-.container {
-  text-align: center;
-  background-image: url('..item/images.jpg');
-  background-repeat: no-repeat;
-  background-size: cover;
-  width: 100%;
-  height: 100vh;
-  display: /* Missing value */ block; /* Example: You can use 'block', 'flex', 'inline', etc. */
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>School Management Frontend</title>
+</head>
+<body>
+    <h1>School Management Frontend</h1>
+    <label for="id">Student ID:</label>
+    <input type="number" id="id">
+    <label for="name">Name:</label>
+    <input type="text" id="name">
+    <label for="age">Age:</label>
+    <input type="number" id="age">
+    <button onclick="addStudent()">Add Student</button>
+    <button onclick="getStudent()">Get Student</button>
+    <button onclick="getTotalStudents()">Total Students</button>
+    <p id="output"></p>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>
