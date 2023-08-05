@@ -1,6 +1,6 @@
 # Smart Contract Project
 
-For this project, ww have to write a smart contract that implements the require(), assert() and revert() statements.
+For this project, we have to write a smart contract that implements the require(), assert() and revert() statements.
 
 ## Description
 
