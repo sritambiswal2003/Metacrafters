@@ -1,56 +1,26 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-contract SCM {
-    address payable public owner;
-    uint256 public balance;
-
-    event Deposit(uint256 amount);
-    event Withdraw(uint256 amount);
-    event Buy(uint256 item);
-
-    constructor(uint initBalance) payable {
-        owner = payable(msg.sender);
-        balance = initBalance;
+contract SchoolManagement {
+    struct Student {
+        uint256 id;
+        string name;
+        uint256 age;
     }
 
-    function getBalance() public view returns (uint256) {
-        return balance;
+    mapping(uint256 => Student) private students;
+    uint256 private totalStudents;
+
+    function addStudent(uint256 _id, string memory _name, uint256 _age) external {
+        students[_id] = Student(_id, _name, _age);
+        totalStudents++;
     }
 
-    function deposit(uint256 _amount) public payable {
-        uint256 _previousBalance = balance;
-        require(msg.sender == owner, "You are not the owner of this account");
-        balance += _amount;
-        assert(balance == _previousBalance + _amount);
-
-        emit Deposit(_amount);
+    function getStudent(uint256 _id) external view returns (uint256, string memory, uint256) {
+        return (students[_id].id, students[_id].name, students[_id].age);
     }
 
-    error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
-
-    function withdraw(uint256 _withdrawAmount) public {
-        require(msg.sender == owner, "You are not the owner of this account");
-        uint256 _previousBalance = balance;
-        if (balance < _withdrawAmount) {
-            revert InsufficientBalance(balance, _withdrawAmount);
-        }
-        balance -= _withdrawAmount;
-        assert(balance == _previousBalance - _withdrawAmount);
-        emit Withdraw(_withdrawAmount);
-    }
-
-    function buy(uint256 item) external {
-        uint256 amount;
-        if (item == 1) {
-            amount = 150;
-        } else if (item == 2) {
-            amount = 200;
-        } else {
-            amount = 600;
-        }
-        require(amount > 0, "Invalid redeem amount");
-        withdraw(amount);
-        emit Buy(item);
+    function getTotalStudents() external view returns (uint256) {
+        return totalStudents;
     }
 }
