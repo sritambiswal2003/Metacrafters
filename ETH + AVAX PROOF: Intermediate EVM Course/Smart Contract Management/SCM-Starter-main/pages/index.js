@@ -1,127 +1,181 @@
-window.addEventListener('load', async () => {
-  // Check if Web3 is injected by the browser (modern browsers with MetaMask)
-  if (typeof web3 !== 'undefined') {
-    // Use the existing provider
-    window.web3 = new Web3(web3.currentProvider);
+// DApp Configuration
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+let abi = null;
+let bankContract = null;
+let isConnected = false;
+
+// DOM Elements
+const content = document.getElementById("content");
+const connectBtn = document.getElementById("connect-btn");
+const address = document.getElementById("account");
+const accountName = document.getElementById("account-name");
+const accountBalance = document.getElementById("balance");
+const reciever = document.getElementById("reciever");
+const amount = document.getElementById("amount");
+const confirmTransferBtn = document.getElementById("confirm-transfer-btn");
+const nameInput = document.getElementById("input-name");
+const confirmNameButton = document.getElementById("confirm-name-btn");
+
+// Event Listeners
+confirmTransferBtn.addEventListener("click", transfer);
+confirmNameButton.addEventListener("click", updateName);
+
+// Initialize DApp
+initDApp();
+
+// DApp Initialization
+function initDApp() {
+  if (!isConnected) {
+    hideContent();
+    fetchABI();
+    tryConnection();
   } else {
-    // Set up a new provider (e.g., local development blockchain)
-    window.web3 = new Web3('http://localhost:8545');
+    displayError("Connect To MetaMask", true);
   }
+}
 
-  // Contract address and ABI (Replace with your deployed contract details)
-  const contractAddress = '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4';
-  const contractABI = [
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_id",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "_name",
-          "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_age",
-          "type": "uint256"
-        }
-      ],
-      "name": "addStudent",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_id",
-          "type": "uint256"
-        }
-      ],
-      "name": "getStudent",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "name",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "age",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct SchoolManagement.Student",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getTotalStudents",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    }
-  ];
+// Try connecting to MetaMask
+function tryConnection() {
+  if (window.ethereum && window.ethereum.isMetaMask) {
+    isConnected = true;
+    connectBtn.addEventListener("click", connectWallet);
+  } else {
+    displayError("Please install MetaMask!", true);
+  }
+}
 
-  // Create contract instance
-  const schoolContract = new web3.eth.Contract(contractABI, contractAddress);
+// Connect Wallet
+async function connectWallet() {
+  try {
+    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+    bankContract = getBankContract();
+    updateContent(accounts[0]);
+  } catch (error) {
+    displayError("Could not connect to MetaMask", true, error);
+  }
+}
 
-  // Function to add a student
-  const addStudent = async () => {
-    const id = document.getElementById('id').value;
-    const name = document.getElementById('name').value;
-    const age = document.getElementById('age').value;
+// Get Bank Contract
+function getBankContract() {
+  if (window.ethereum && window.ethereum.isMetaMask) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    return contract;
+  }
+}
+
+// Update Content with Account Information
+async function updateContent(account) {
+  address.innerHTML = account;
+  try {
+    let balance = await bankContract.getBalance();
+    let name = await bankContract.getAccountName();
+    accountBalance.innerHTML = ethers.utils.formatEther(balance);
+    accountName.innerHTML = name || "User";
+    displayContent();
+  } catch (error) {
+    displayError("Cannot access contract, try later!", true, error);
+  }
+}
+
+// Display Error Message
+function displayError(message = null, show, error = null) {
+  console.log(error || message);
+  isConnected = false;
+  content.innerHTML = show ? message : "Something went wrong, try again later!";
+  displayContent();
+}
+
+// Display DApp Content
+function displayContent() {
+  content.classList.remove("hide");
+  connectBtn.classList.add("disable");
+  connectBtn.innerHTML = "Connected";
+  connectBtn.disabled = true;
+  if (window.ethereum) {
+    window.ethereum.on("transactionHash", (hash) => {
+      updateContent(address.innerText);
+    });
+    window.ethereum.on("accountsChanged", (accounts) => {
+      window.location.reload();
+    });
+    window.ethereum.on("chainChanged", (chainId) => {
+      window.location.reload();
+    });
+  }
+}
+
+// Hide DApp Content
+function hideContent() {
+  content.classList.add("hide");
+  connectBtn.classList.remove("disable");
+  connectBtn.innerHTML = "Connect Wallet";
+  connectBtn.disabled = false;
+}
+
+// Fetch Contract ABI
+function fetchABI() {
+  fetch("http://localhost:3000/artifacts/contracts/Bank.sol/Bank.json")
+    .then((response) => response.json())
+    .then((data) => {
+      abi = data.abi;
+    })
+    .catch((error) => {
+      displayError("Cannot fetch ABI", false, error);
+    });
+}
+
+// Transfer Funds
+async function transfer() {
+  let receiverAddress = reciever.value.trim();
+  let amountValue = ethers.utils.parseEther(amount.value.trim());
+
+  if (receiverAddress && amountValue) {
     try {
-      await schoolContract.methods.addStudent(id, name, age).send({ from: web3.eth.defaultAccount });
-      document.getElementById('output').innerHTML = `Student added: ID - ${id}, Name - ${name}, Age - ${age}`;
-    } catch (err) {
-      console.error(err);
-      document.getElementById('output').innerHTML = 'Error adding student.';
+      const contract = getBankContract();
+      const tx = await contract.transferFunds(receiverAddress, {
+        value: amountValue,
+      });
+      console.log(tx);
+      contract.on("Transfer", (value) => {
+        updateContent(address.innerText);
+        console.log("Tx successful with amount:", value);
+      });
+    } catch (error) {
+      displayError("Cannot transfer", true, error);
     }
-  };
+  } else {
+    displayError("Please fill all fields", true);
+  }
+  hideModal();
+}
 
-  // Function to get a student
-  const getStudent = async () => {
-    const id = document.getElementById('id').value;
+// Update Account Name
+async function updateName() {
+  let newName = nameInput.value.trim();
+  if (newName && newName.length) {
     try {
-      const student = await schoolContract.methods.getStudent(id).call();
-      document.getElementById('output').innerHTML = `Student found: ID - ${student[0]}, Name - ${student[1]}, Age - ${student[2]}`;
-    } catch (err) {
-      console.error(err);
-      document.getElementById('output').innerHTML = 'Student not found.';
+      const contract = getBankContract();
+      await contract.setAccountName(newName);
+      contract.on("NameUpdate", (value) => {
+        updateContent(address.innerText);
+      });
+    } catch (error) {
+      displayError(
+        "New name is same as old name! Kindly Refresh",
+        true,
+        error
+      );
     }
-  };
+  } else {
+    displayError("Please Enter a name", true);
+  }
+  hideModal();
+}
 
-  // Function to get total students
-  const getTotalStudents = async () => {
-    try {
-      const totalStudents = await schoolContract.methods.getTotalStudents().call();
-      document.getElementById('output').innerHTML = `Total Students: ${totalStudents}`;
-    } catch (err) {
-      console.error(err);
-      document.getElementById('output').innerHTML = 'Error getting total students.';
-    }
-  };
-});
+// Hide Modal
+function hideModal() {
+  document.getElementById("closeTransfer").click();
+  document.getElementById("closeName").click();
+}
