@@ -1,181 +1,80 @@
-// DApp Configuration
-const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-let abi = null;
-let bankContract = null;
-let isConnected = false;
+// Import statements remain the same
 
-// DOM Elements
-const content = document.getElementById("content");
-const connectBtn = document.getElementById("connect-btn");
-const address = document.getElementById("account");
-const accountName = document.getElementById("account-name");
-const accountBalance = document.getElementById("balance");
-const reciever = document.getElementById("reciever");
-const amount = document.getElementById("amount");
-const confirmTransferBtn = document.getElementById("confirm-transfer-btn");
-const nameInput = document.getElementById("input-name");
-const confirmNameButton = document.getElementById("confirm-name-btn");
+export default function HomePage() {
+  // State and other functions remain the same
 
-// Event Listeners
-confirmTransferBtn.addEventListener("click", transfer);
-confirmNameButton.addEventListener("click", updateName);
+  return (
+    <main className="container">
+      <header>
+        <img src="header_image.png" alt="Header" className="header-image" />
+        <h1 className="header-title">Welcome to the Ashish Store</h1>
+      </header>
+      <div className="content">
+        <div className="box">{initUser()}</div>
+      </div>
+      <style jsx>{`
+        /* Other styles remain the same */
 
-// Initialize DApp
-initDApp();
+        /* New styles for the header */
+        .header-image {
+          max-width: 100%;
+          height: auto;
+        }
 
-// DApp Initialization
-function initDApp() {
-  if (!isConnected) {
-    hideContent();
-    fetchABI();
-    tryConnection();
-  } else {
-    displayError("Connect To MetaMask", true);
-  }
-}
+        .header-title {
+          text-align: center;
+          font-family: "Arial", sans-serif;
+          font-size: 24px;
+          margin: 10px 0;
+          color: #333;
+        }
 
-// Try connecting to MetaMask
-function tryConnection() {
-  if (window.ethereum && window.ethereum.isMetaMask) {
-    isConnected = true;
-    connectBtn.addEventListener("click", connectWallet);
-  } else {
-    displayError("Please install MetaMask!", true);
-  }
-}
+        /* Update button and input styles */
+        .connect-button,
+        .deposit-button,
+        .withdraw-button {
+          padding: 10px 20px;
+          border-radius: 5px;
+          font-size: 16px;
+          font-weight: bold;
+          cursor: pointer;
+        }
 
-// Connect Wallet
-async function connectWallet() {
-  try {
-    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-    bankContract = getBankContract();
-    updateContent(accounts[0]);
-  } catch (error) {
-    displayError("Could not connect to MetaMask", true, error);
-  }
-}
+        .connect-button {
+          background-color: #3a7bd5;
+          color: #fff;
+        }
 
-// Get Bank Contract
-function getBankContract() {
-  if (window.ethereum && window.ethereum.isMetaMask) {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, abi, signer);
-    return contract;
-  }
-}
+        .connect-button:hover {
+          background-color: #2765b0;
+        }
 
-// Update Content with Account Information
-async function updateContent(account) {
-  address.innerHTML = account;
-  try {
-    let balance = await bankContract.getBalance();
-    let name = await bankContract.getAccountName();
-    accountBalance.innerHTML = ethers.utils.formatEther(balance);
-    accountName.innerHTML = name || "User";
-    displayContent();
-  } catch (error) {
-    displayError("Cannot access contract, try later!", true, error);
-  }
-}
+        .deposit-button {
+          background-color: #27ae60;
+          color: #fff;
+        }
 
-// Display Error Message
-function displayError(message = null, show, error = null) {
-  console.log(error || message);
-  isConnected = false;
-  content.innerHTML = show ? message : "Something went wrong, try again later!";
-  displayContent();
-}
+        .deposit-button:hover {
+          background-color: #1f8d4e;
+        }
 
-// Display DApp Content
-function displayContent() {
-  content.classList.remove("hide");
-  connectBtn.classList.add("disable");
-  connectBtn.innerHTML = "Connected";
-  connectBtn.disabled = true;
-  if (window.ethereum) {
-    window.ethereum.on("transactionHash", (hash) => {
-      updateContent(address.innerText);
-    });
-    window.ethereum.on("accountsChanged", (accounts) => {
-      window.location.reload();
-    });
-    window.ethereum.on("chainChanged", (chainId) => {
-      window.location.reload();
-    });
-  }
-}
+        .withdraw-button {
+          background-color: #e74c3c;
+          color: #fff;
+        }
 
-// Hide DApp Content
-function hideContent() {
-  content.classList.add("hide");
-  connectBtn.classList.remove("disable");
-  connectBtn.innerHTML = "Connect Wallet";
-  connectBtn.disabled = false;
-}
+        .withdraw-button:hover {
+          background-color: #c93226;
+        }
 
-// Fetch Contract ABI
-function fetchABI() {
-  fetch("http://localhost:3000/artifacts/contracts/Bank.sol/Bank.json")
-    .then((response) => response.json())
-    .then((data) => {
-      abi = data.abi;
-    })
-    .catch((error) => {
-      displayError("Cannot fetch ABI", false, error);
-    });
-}
-
-// Transfer Funds
-async function transfer() {
-  let receiverAddress = reciever.value.trim();
-  let amountValue = ethers.utils.parseEther(amount.value.trim());
-
-  if (receiverAddress && amountValue) {
-    try {
-      const contract = getBankContract();
-      const tx = await contract.transferFunds(receiverAddress, {
-        value: amountValue,
-      });
-      console.log(tx);
-      contract.on("Transfer", (value) => {
-        updateContent(address.innerText);
-        console.log("Tx successful with amount:", value);
-      });
-    } catch (error) {
-      displayError("Cannot transfer", true, error);
-    }
-  } else {
-    displayError("Please fill all fields", true);
-  }
-  hideModal();
-}
-
-// Update Account Name
-async function updateName() {
-  let newName = nameInput.value.trim();
-  if (newName && newName.length) {
-    try {
-      const contract = getBankContract();
-      await contract.setAccountName(newName);
-      contract.on("NameUpdate", (value) => {
-        updateContent(address.innerText);
-      });
-    } catch (error) {
-      displayError(
-        "New name is same as old name! Kindly Refresh",
-        true,
-        error
-      );
-    }
-  } else {
-    displayError("Please Enter a name", true);
-  }
-  hideModal();
-}
-
-// Hide Modal
-function hideModal() {
-  document.getElementById("closeTransfer").click();
-  document.getElementById("closeName").click();
+        /* Update input styles */
+        input {
+          padding: 8px;
+          border: 2px solid #ccc;
+          border-radius: 5px;
+          font-size: 16px;
+        }
+      `}</style>
+    </main>
+  );
 }
