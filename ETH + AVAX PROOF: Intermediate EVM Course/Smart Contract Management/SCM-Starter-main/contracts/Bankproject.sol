@@ -1,40 +1,46 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.9;
 
-contract NewBank {
-    mapping(address => string) accountData;
+contract Assessment {
+    address public owner;
+    uint256 public balance;
 
-    event FundsTransferred(uint256 amount);
-    event DataUpdated(string value);
+    event Deposit(address indexed account, uint256 amount);
+    event Withdraw(address indexed account, uint256 amount);
 
-    function setAccountData(string memory _data) public {
-        require(
-            keccak256(abi.encodePacked(accountData[msg.sender])) !=
-                keccak256(abi.encodePacked(_data)),
-            "New data is same as old data"
-        );
-        accountData[msg.sender] = _data;
-
-        emit DataUpdated(accountData[msg.sender]);
+    constructor(uint256 initBalance) payable {
+        owner = msg.sender;
+        balance = initBalance;
     }
 
-    function getAccountData() public view returns (string memory) {
-        return accountData[msg.sender];
+    function getBalance() public view returns (uint256) {
+        return balance;
     }
 
-    error InsufficientBalanceError(uint256 balance, uint256 withdrawAmount);
-
-    function transferEther(address payable _to) public payable {
-        _to.transfer(msg.value);
-        if (msg.sender.balance < msg.value)
-            revert InsufficientBalanceError({
-                balance: msg.sender.balance,
-                withdrawAmount: msg.value
-            });
-        emit FundsTransferred(msg.value);
+    function deposit() public payable {
+        balance += msg.value;
+        emit Deposit(msg.sender, msg.value);
     }
 
-    function getAccountBalance() public view returns (uint256) {
-        return msg.sender.balance;
+    error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
+
+    function withdraw(uint256 _withdrawAmount) public {
+        require(balance >= _withdrawAmount, "Insufficient balance");
+        balance -= _withdrawAmount;
+        payable(msg.sender).transfer(_withdrawAmount);
+        emit Withdraw(msg.sender, _withdrawAmount);
+    }
+
+    function withdrawAll() public {
+        uint256 _balance = balance;
+        require(_balance > 0, "No balance to withdraw");
+        balance = 0;
+        payable(msg.sender).transfer(_balance);
+        emit Withdraw(msg.sender, _balance);
+    }
+
+    function renounceOwnership() public {
+        require(msg.sender == owner, "Only the owner can renounce ownership");
+        owner = address(0);
     }
 }
